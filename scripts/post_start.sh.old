@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+
+echo "[POST-START] Installing A1111 extensions..."
+
+A1111_EXT_DIR="/workspace/stable-diffusion-webui/extensions"
+
+declare -A A1111_EXTENSIONS=(
+    ["sd-webui-infinite-image-browsing"]="https://github.com/zanllp/sd-webui-infinite-image-browsing"
+    ["sd-civitai-browser-plus"]="https://github.com/BlafKing/sd-civitai-browser-plus.git"
+    ["sd-webui-reactor"]="https://codeberg.org/Gourieff/sd-webui-reactor.git"
+)
+
+mkdir -p "$A1111_EXT_DIR"
+
+for EXT_NAME in "${!A1111_EXTENSIONS[@]}"; do
+    EXT_PATH="$A1111_EXT_DIR/$EXT_NAME"
+    if [ ! -d "$EXT_PATH" ]; then
+        echo "Cloning $EXT_NAME..."
+        git clone "${A1111_EXTENSIONS[$EXT_NAME]}" "$EXT_PATH"
+    else
+        echo "$EXT_NAME already installed. Skipping."
+    fi
+done
+
+# Install requirements.txt for each A1111 extension if exists
+for d in "$A1111_EXT_DIR"/*; do
+    if [ -f "$d/requirements.txt" ]; then
+        echo "Installing requirements for $d"
+        pip install -r "$d/requirements.txt"
+    fi
+done
+
+echo "[POST-START] Installing ComfyUI custom nodes..."
+
+COMFY_CUSTOM_NODE_DIR="/workspace/comfyui/custom_nodes"
+
+declare -A COMFY_NODES=(
+    ["ComfyUI-Manager"]="https://github.com/Comfy-Org/ComfyUI-Manager.git"
+)
+
+mkdir -p "$COMFY_CUSTOM_NODE_DIR"
+
+for NODE_NAME in "${!COMFY_NODES[@]}"; do
+    NODE_PATH="$COMFY_CUSTOM_NODE_DIR/$NODE_NAME"
+    if [ ! -d "$NODE_PATH" ]; then
+        echo "Cloning $NODE_NAME..."
+        git clone "${COMFY_NODES[$NODE_NAME]}" "$NODE_PATH"
+    else
+        echo "$NODE_NAME already installed. Skipping."
+    fi
+done
+
+# Install requirements.txt for each ComfyUI node if exists
+for d in "$COMFY_CUSTOM_NODE_DIR"/*; do
+    if [ -f "$d/requirements.txt" ]; then
+        echo "Installing requirements for $d"
+        pip install -r "$d/requirements.txt"
+    fi
+done
+
+echo "[POST-START] All requested extensions and nodes installed!"
