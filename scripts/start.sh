@@ -177,6 +177,14 @@ check_python_version() {
     python3 -V
 }
 
+#!/usr/bin/env bash
+# ---------------------------------------------------------------------------- #
+#                          Function Definitions                                #
+# ---------------------------------------------------------------------------- #
+
+# (Most functions unchanged - kept as-is for context)
+# Skipping unchanged ones like check_cuda_version, test_pytorch_cuda, etc.
+
 start_forge() {
     echo "FORGE: Setting up and launching..."
 
@@ -210,21 +218,12 @@ start_forge() {
         git clone --depth=1 https://github.com/civitai/sd_civitai_extension.git extensions/sd_civitai_extension
         git clone --depth=1 https://github.com/BlafKing/sd-civitai-browser-plus.git extensions/sd-civitai-browser-plus
 
-        echo "Installing extension dependencies..."
-        cd extensions/sd-webui-reactor
-        pip install -r requirements.txt
-        pip install onnxruntime-gpu
+        echo "Installing all Forge extension dependencies in one pip call..."
+        pip install -r extensions/sd-webui-reactor/requirements.txt \
+                    -r extensions/infinite-image-browsing/requirements.txt \
+                    -r extensions/sd_civitai_extension/requirements.txt \
+                    onnxruntime-gpu send2trash beautifulsoup4 ZipUnicode fake-useragent packaging pysocks
 
-        cd ../infinite-image-browsing
-        pip install -r requirements.txt
-
-        cd ../sd_civitai_extension
-        pip install -r requirements.txt
-
-        cd ../sd-civitai-browser-plus
-        pip install send2trash beautifulsoup4 ZipUnicode fake-useragent packaging pysocks
-
-        cd "$FORGE_DIR"
         deactivate
     fi
 
@@ -258,39 +257,34 @@ start_comfyui() {
 
         mkdir -p "$CUSTOM_NODES_DIR"
 
+        # Clone extensions (no parsing, just straight-up Forge-style)
         git clone https://github.com/ltdrdata/ComfyUI-Manager.git "$CUSTOM_NODES_DIR/ComfyUI-Manager"
-        pip install -r "$CUSTOM_NODES_DIR/ComfyUI-Manager/requirements.txt"
-
         git clone https://github.com/rgthree/rgthree-comfy.git "$CUSTOM_NODES_DIR/rgthree-comfy"
-        pip install -r "$CUSTOM_NODES_DIR/rgthree-comfy/requirements.txt"
-
         git clone https://github.com/ltdrdata/ComfyUI-Impact-Pack.git "$CUSTOM_NODES_DIR/ComfyUI-Impact-Pack"
-        pip install -r "$CUSTOM_NODES_DIR/ComfyUI-Impact-Pack/requirements.txt"
-
         git clone https://github.com/Fannovel16/comfyui_controlnet_aux.git "$CUSTOM_NODES_DIR/comfyui_controlnet_aux"
-        pip install -r "$CUSTOM_NODES_DIR/comfyui_controlnet_aux/requirements.txt"
-
         git clone https://github.com/yolain/ComfyUI-Easy-Use.git "$CUSTOM_NODES_DIR/ComfyUI-Easy-Use"
-        pip install -r "$CUSTOM_NODES_DIR/ComfyUI-Easy-Use/requirements.txt"
-
         git clone https://github.com/kijai/ComfyUI-Florence2.git "$CUSTOM_NODES_DIR/ComfyUI-Florence2"
-        pip install -r "$CUSTOM_NODES_DIR/ComfyUI-Florence2/requirements.txt"
-
         git clone https://github.com/WASasquatch/was-node-suite-comfyui.git "$CUSTOM_NODES_DIR/was-node-suite-comfyui"
-        pip install -r "$CUSTOM_NODES_DIR/was-node-suite-comfyui/requirements.txt"
-
         git clone https://github.com/cubiq/ComfyUI_essentials.git "$CUSTOM_NODES_DIR/ComfyUI_essentials"
-        pip install -r "$CUSTOM_NODES_DIR/ComfyUI_essentials/requirements.txt"
-
         git clone https://github.com/Jonseed/ComfyUI-Detail-Daemon.git "$CUSTOM_NODES_DIR/ComfyUI-Detail-Daemon"
-        pip install -r "$CUSTOM_NODES_DIR/ComfyUI-Detail-Daemon/requirements.txt"
-
         git clone https://codeberg.org/Gourieff/comfyui-reactor-node.git "$CUSTOM_NODES_DIR/comfyui-reactor-node"
-        pip install -r "$CUSTOM_NODES_DIR/comfyui-reactor-node/requirements.txt"
-
         git clone https://github.com/JPS-GER/ComfyUI_JPS-Nodes.git "$CUSTOM_NODES_DIR/ComfyUI_JPS-Nodes"
         git clone https://github.com/Suzie1/ComfyUI_Comfyroll_CustomNodes.git "$CUSTOM_NODES_DIR/ComfyUI_Comfyroll_CustomNodes"
         git clone https://github.com/theUpsider/ComfyUI-Logic.git "$CUSTOM_NODES_DIR/ComfyUI-Logic"
+
+        # Install all extension requirements in one pip call
+        echo "Installing all ComfyUI extension requirements in one pip call..."
+        pip install \
+            -r "$CUSTOM_NODES_DIR/ComfyUI-Manager/requirements.txt" \
+            -r "$CUSTOM_NODES_DIR/rgthree-comfy/requirements.txt" \
+            -r "$CUSTOM_NODES_DIR/ComfyUI-Impact-Pack/requirements.txt" \
+            -r "$CUSTOM_NODES_DIR/comfyui_controlnet_aux/requirements.txt" \
+            -r "$CUSTOM_NODES_DIR/ComfyUI-Easy-Use/requirements.txt" \
+            -r "$CUSTOM_NODES_DIR/ComfyUI-Florence2/requirements.txt" \
+            -r "$CUSTOM_NODES_DIR/was-node-suite-comfyui/requirements.txt" \
+            -r "$CUSTOM_NODES_DIR/ComfyUI_essentials/requirements.txt" \
+            -r "$CUSTOM_NODES_DIR/ComfyUI-Detail-Daemon/requirements.txt" \
+            -r "$CUSTOM_NODES_DIR/comfyui-reactor-node/requirements.txt"
 
         deactivate
     fi
@@ -302,6 +296,8 @@ start_comfyui() {
         --highvram --cuda-malloc &> /workspace/logs/comfyui.log &
     deactivate
 }
+
+
 
 
 # ---------------------------------------------------------------------------- #

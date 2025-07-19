@@ -22,7 +22,7 @@ group "default" {
 
 target "py310-cu124-torch250" {
     dockerfile = "./dockerfiles/with-xformers-cuxxx/Dockerfile"
-    tags = ["${REGISTRY}/${REGISTRY_USER}/forge_comfy:${RELEASE}"]
+    tags = ["${REGISTRY}/${REGISTRY_USER}/forge_comfyui:${RELEASE}"]
     args = {
         BASE_IMAGE = "nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04"
         REQUIRED_CUDA_VERSION = "12.4"
